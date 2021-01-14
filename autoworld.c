@@ -28,9 +28,10 @@ int main(void)
 
   float c[2] = { POINTS_OF_INTEREST[0][0], POINTS_OF_INTEREST[0][1] };
 
-  float offsetStart[2] = {0.492528051138,0.150938585401};
+  float offsetStart[2] = {0,0};//{0.492528051138,0.150938585401};
   float offset[2] = {offsetStart[0], offsetStart[1]};
-  float zoom = 1.0;//1024.0f;
+  float zoomStart = 1.0;
+  float zoom = zoomStart;
   float brightness = 1.0f;
 
   Vector2 offsetSpeed = { 0.0f, 0.0f };
@@ -65,7 +66,7 @@ int main(void)
       offset[0] = offsetStart[0];
       offset[1] = offsetStart[1];
       if(IsKeyDown(KEY_LEFT_SHIFT))
-        zoom = 1.0f;
+        zoom = zoomStart;
       dirty = 1;
     }
     if(0) ;
@@ -77,7 +78,7 @@ int main(void)
     else if (IsKeyPressed(KEY_SIX))   c[0] = POINTS_OF_INTEREST[5][0], c[1] = POINTS_OF_INTEREST[5][1], dirty=1;
 
     if(GetMouseWheelMove() != 0) {
-      zoom += GetMouseWheelMove() * zoom*0.1f;
+      zoom += GetMouseWheelMove() * zoom*0.3f;
       dirty = 1;
     }
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -118,8 +119,8 @@ int main(void)
       SetShaderValue(shader, GetShaderLocation(shader, "zoom"), &zoom, UNIFORM_FLOAT);
       SetShaderValue(shader, GetShaderLocation(shader, "offset"), offset, UNIFORM_VEC2);
       // glUniform3dv(shader.id, GetShaderLocation(shader, "offset"), &offset);
-      float screenDims[2] = { (float)GetScreenWidth(), (float)GetScreenHeight() };
-      SetShaderValue(shader, GetShaderLocation(shader, "screenDims"), screenDims, UNIFORM_VEC2);
+      float resolution[2] = { (float)GetScreenWidth(), (float)GetScreenHeight() };
+      SetShaderValue(shader, GetShaderLocation(shader, "resolution"), resolution, UNIFORM_VEC2);
       SetShaderValue(shader, GetShaderLocation(shader, "brightness"), &brightness, UNIFORM_FLOAT);
     }
 
@@ -135,12 +136,12 @@ int main(void)
 
     }
     /**/Color color_text = MAGENTA; int size=20; int ty = 10;
-    /**/DrawText(FormatText("fps %d time %.2f", GetFPS(), time), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(FormatText("fps %d @ %.1f", GetFPS(), time), 10, ty, size, color_text); ty+=size;
     /**/DrawText(FormatText("offset [%.4f,%.4f]",
                             offset[0], offset[1]), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(FormatText("zoom %.0f (%.0f²)", zoom, 1.0/(zoom*0.0000001)), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(FormatText("zoom %.3f (%.0f²)", zoom, 2.0/(zoom)), 10, ty, size, color_text); ty+=size;
     /**/DrawText(FormatText("c [%.6f,%.6f]", c[0], c[1]), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(FormatText("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
+    ///**/DrawText(FormatText("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
     EndDrawing();
 
     frame++;

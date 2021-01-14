@@ -1,9 +1,7 @@
 #version 440
-
-
 out vec4 finalColor; // output fragment color
 
-uniform vec2 screenDims; // screen size
+uniform vec2 resolution; // screen size
 uniform vec2 c; // c.x = real, c.y = imaginary component. Equation is z^2 + c
 uniform vec2 offset;
 uniform float zoom;
@@ -41,11 +39,11 @@ vec4 grad4(float j, vec4 ip) {
   p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;
   p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
   s = vec4(lessThan(p, vec4(0.0)));
-  p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www; 
+  p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www;
 
   return p;
 }
-						
+
 // (sqrt(5) - 1)/4 = F4, used once below
 #define F4 0.309016994374947451
 
@@ -60,19 +58,14 @@ double dsnoise(dvec2 v) {
 
 // Other corners
   dvec2 i1;
-  //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-  //i1.y = 1.0 - i1.x;
   i1 = (x0.x > x0.y) ? dvec2(1.0, 0.0) : dvec2(0.0, 1.0);
-  // x0 = x0 - 0.0 + 0.0 * C.xx ;
-  // x1 = x0 - i1 + 1.0 * C.xx ;
-  // x2 = x0 - 1.0 + 2.0 * C.xx ;
   dvec4 x12 = x0.xyxy + C.xxzz;
   x12.xy -= i1;
 
 // Permutations
   i = mod289(i); // Avoid truncation effects in permutation
-  dvec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
-                     + i.x + dvec3(0.0, i1.x, 1.0 ));
+  dvec3 p = permute( permute( i.y + dvec3(0.0, i1.y, 1.0 ))
+                            + i.x + dvec3(0.0, i1.x, 1.0 ));
 
   dvec3 m = max(0.5 - dvec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
   m = m*m ;
@@ -108,12 +101,7 @@ float snoise(vec2 v) {
 
 // Other corners
   vec2 i1;
-  //i1.x = step( x0.y, x0.x ); // x0.x > x0.y ? 1.0 : 0.0
-  //i1.y = 1.0 - i1.x;
   i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-  // x0 = x0 - 0.0 + 0.0 * C.xx ;
-  // x1 = x0 - i1 + 1.0 * C.xx ;
-  // x2 = x0 - 1.0 + 2.0 * C.xx ;
   vec4 x12 = x0.xyxy + C.xxzz;
   x12.xy -= i1;
 
@@ -146,7 +134,7 @@ float snoise(vec2 v) {
 }
 
 float snoise(vec3 v)
-{ 
+{
   const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
   const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
 
@@ -169,10 +157,10 @@ float snoise(vec3 v)
   vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
 
 // Permutations
-  i = mod289(i); 
-  vec4 p = permute( permute( permute( 
+  i = mod289(i);
+  vec4 p = permute( permute( permute(
                                i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
-                             + i.y + vec4(0.0, i1.y, i2.y, 1.0 )) 
+                             + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
                     + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
 
 // Gradients: 7x7 points over a square, mapped onto an octahedron.
@@ -216,7 +204,7 @@ float snoise(vec3 v)
 // Mix final noise value
   vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
   m = m * m;
-  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), 
+  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
@@ -247,7 +235,7 @@ float snoise(vec4 v) {
   vec4 x3 = x0 - i3 + C.zzzz;
   vec4 x4 = x0 + C.wwww;
 
-  i = mod289(i); 
+  i = mod289(i);
   float j0 = permute( permute( permute( permute(i.w) + i.z) + i.y) + i.x);
   vec4 j1 = permute( permute( permute( permute (
                                          i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))
@@ -299,8 +287,8 @@ void grid(vec2 sp) {
 
 // screen => world coordinates
 dvec2 point(vec2 fragCoord) {
-  dvec2 aspect = dvec2(screenDims.x / screenDims.y, 1.0);
-  return (((fragCoord / screenDims) - dvec2(0.5, 0.5)) * aspect / zoom) + offset;
+  dvec2 aspect = dvec2(resolution.x / resolution.y, 1.0);
+  return (((fragCoord / resolution) - dvec2(0.5, 0.5)) * aspect / zoom) + offset;
 }
 
 double height0(dvec2 start, double z, int octave) {
@@ -346,12 +334,59 @@ vec3 terrain(double height) {
   return result;
 }
 
+float h21(vec2 p) {
+    p=fract(p*vec2(589.27,916.79));
+    p+=dot(p,p+23.51);
+    return fract(p.x*p.y);
+}
+
+// https://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
+float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio
+float gold_noise(in vec2 xy, in float seed) {
+  float factor = xy.x == 0 ? 12345 : xy.x; // remove x=0 artifact
+  return fract(tan(distance(xy*PHI, xy)*seed)*factor);
+}
+
+// get world coordinates
+vec2 world_() {
+  vec2 aspect = vec2(resolution.x / resolution.y, 1.0);
+  return (((gl_FragCoord.xy / resolution) - vec2(0.5, 0.5)) * aspect / zoom) + offset;
+}
+vec2 world()      { return floor(world_()); }
+vec2 worldfract() { return fract(world_()); }
+
+void main2() {
+
+  //z = max(-0.8, min(0.8, z));
+  finalColor = vec4(0,0,0,1);
+
+  vec2 v = vec2(point(gl_FragCoord.xy));
+  v=floor(v);
+  //v = floor(mod(v, 0.1));
+  //vec2 j = vec2(h21(v), (h21(v)));
+  float region = snoise(world()*0.01);
+  if(region > 0) finalColor.r = region;
+  if(region < 0) finalColor.b = -region;
+  if(region < 0) region = 0;
+  if(gold_noise(world(), 1) < region*region) {
+    float radius = 0.3;
+    vec2 offset = vec2(gold_noise(world(), 2), gold_noise(world(), 3));
+    if(length(worldfract() - offset) < radius) finalColor.g = 1;
+  }
+
+  /* float L = length(worldfract()-0.5); */
+  /* vec3 N = vec3(worldfract()-0.5); */
+  /* finalColor.g = 0.5-clamp(L, 0, 0.5); */
+
+
+  //if(zoom > 0.03) if(worldfract().x < 0.1 || worldfract().y < 0.1) finalColor.b = 0.3;
+}
+
 void main() {
   float psize = 0.1;
   double z = height(gl_FragCoord.xy + vec2(-psize,-psize), c.y);
   vec3 color = terrain(z);
-  // color = mix(color, Hsv2rgb(vec3(z, 1, 1)), 0.0);
-  
+
   if(false) {
     color += terrain(height(gl_FragCoord.xy + vec2(+psize,-psize), c.y));
     color += terrain(height(gl_FragCoord.xy + vec2(-psize,+psize), c.y));
@@ -382,7 +417,6 @@ void main() {
   //if(z2 < 0.002) z2 = 0.5;
   //color = mix(color, Hsv2rgb(vec3(z2, 1, 1)), 0.5);
   finalColor = vec4(color, 1);
-  if(false && gl_FragCoord.y / screenDims.y < 0.02)
-    finalColor = vec4(Hsv2rgb(vec3(gl_FragCoord.x/screenDims.x, 1.0, 1.0)), 1);
+  if(false && gl_FragCoord.y / resolution.y < 0.02)
+    finalColor = vec4(Hsv2rgb(vec3(gl_FragCoord.x/resolution.x, 1.0, 1.0)), 1);
 }
-
