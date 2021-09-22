@@ -112,21 +112,21 @@ int main(void)
     c[0] += amount2;
     c[1] += amount1;
     if(amount1 != 0.0f || amount2 != 0.0f && shader.id != BADSHADER)
-      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, SHADER_UNIFORM_VEC2);
 
     if((dirty || frame==0) && shader.id != BADSHADER) {
-      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, UNIFORM_VEC2);
-      SetShaderValue(shader, GetShaderLocation(shader, "zoom"), &zoom, UNIFORM_FLOAT);
-      SetShaderValue(shader, GetShaderLocation(shader, "offset"), offset, UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "zoom"), &zoom, SHADER_UNIFORM_FLOAT);
+      SetShaderValue(shader, GetShaderLocation(shader, "offset"), offset, SHADER_UNIFORM_VEC2);
       // glUniform3dv(shader.id, GetShaderLocation(shader, "offset"), &offset);
       float resolution[2] = { (float)GetScreenWidth(), (float)GetScreenHeight() };
-      SetShaderValue(shader, GetShaderLocation(shader, "resolution"), resolution, UNIFORM_VEC2);
-      SetShaderValue(shader, GetShaderLocation(shader, "brightness"), &brightness, UNIFORM_FLOAT);
+      SetShaderValue(shader, GetShaderLocation(shader, "resolution"), resolution, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "brightness"), &brightness, SHADER_UNIFORM_FLOAT);
     }
 
     float time = GetTime();
     if(shader.id != BADSHADER && GetShaderLocation(shader, "time") >= 0)
-      SetShaderValue(shader, GetShaderLocation(shader, "time"), &time, UNIFORM_FLOAT);
+      SetShaderValue(shader, GetShaderLocation(shader, "time"), &time, SHADER_UNIFORM_FLOAT);
 
     BeginDrawing();
     if(dirty || !idle) {
