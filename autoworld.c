@@ -16,8 +16,7 @@ const float POINTS_OF_INTEREST[6][2] =
   // { -0.831522226334,-0.238089501858 },
 };
 
-int main(void)
-{
+int main(void) {
   SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(900, 600, "raylib [shaders] example - julia sets [floating]");
 
@@ -36,7 +35,7 @@ int main(void)
 
   Vector2 offsetSpeed = { 0.0f, 0.0f };
 
-  SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+  SetTargetFPS(15);               // Set our game to run at 60 frames-per-second
 
   struct stat shaderPathStat = {0};
   stat(shaderPath, &shaderPathStat);
@@ -136,12 +135,12 @@ int main(void)
 
     }
     /**/Color color_text = MAGENTA; int size=20; int ty = 10;
-    /**/DrawText(FormatText("fps %d @ %.1f", GetFPS(), time), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(FormatText("offset [%.4f,%.4f]",
+    /**/DrawText(TextFormat("fps %d @ %.1f", GetFPS(), time), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(TextFormat("offset [%.4f,%.4f]",
                             offset[0], offset[1]), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(FormatText("zoom %.3f (%.0f²)", zoom, 2.0/(zoom)), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(FormatText("c [%.6f,%.6f]", c[0], c[1]), 10, ty, size, color_text); ty+=size;
-    ///**/DrawText(FormatText("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(TextFormat("zoom %.3f (%.0f²)", zoom, 2.0/(zoom)), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(TextFormat("c [%.6f,%.6f]", c[0], c[1]), 10, ty, size, color_text); ty+=size;
+    ///**/DrawText(TextFormat("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
     EndDrawing();
 
     frame++;

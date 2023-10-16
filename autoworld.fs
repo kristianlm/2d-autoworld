@@ -355,7 +355,7 @@ vec2 world_() {
 vec2 world()      { return floor(world_()); }
 vec2 worldfract() { return fract(world_()); }
 
-void main2() {
+void main_wip() {
 
   //z = max(-0.8, min(0.8, z));
   finalColor = vec4(0,0,0,1);
@@ -382,7 +382,16 @@ void main2() {
   //if(zoom > 0.03) if(worldfract().x < 0.1 || worldfract().y < 0.1) finalColor.b = 0.3;
 }
 
+
 void main() {
+  float psize = 0.1;
+  double z = height(gl_FragCoord.xy + vec2(-psize,-psize), c.y /* + 0.0010*sin(time / 1.0) */);
+  vec3 color = terrain(z);
+  finalColor = vec4(color, 1);
+}
+
+
+void main_colorful() {
   float psize = 0.1;
   double z = height(gl_FragCoord.xy + vec2(-psize,-psize), c.y);
   vec3 color = terrain(z);
@@ -408,15 +417,15 @@ void main() {
   /* } */
   /* if(z < 0) z = 0; */
   /* if(z > 1) z = 1; */
-//  z2 = mix(z, z2, 0.5);
+  /* z2 = mix(z, z2, 0.5); */
   //double z2 = height(gl_FragCoord.xy + vec2(-psize,-psize), c.x);
-  //z2 = smoothstep(0, 1, z2);
+  z2 = smoothstep(0, 1, z2);
   if(z2 > 0 && z2 < 0.002) z2 = 0.5;
-  //z2 = smoothstep(0.002, 1, z2);
-  //if(z2 > 1) z2 = 0.5;
-  //if(z2 < 0.002) z2 = 0.5;
-  //color = mix(color, Hsv2rgb(vec3(z2, 1, 1)), 0.5);
+  z2 = smoothstep(0.002, 1, z2);
+  if(z2 > 1) z2 = 0.5;
+  if(z2 < 0.002) z2 = 0.5;
+  color = mix(color, Hsv2rgb(vec3(z2, 1, 1)), 0.5);
   finalColor = vec4(color, 1);
-  if(false && gl_FragCoord.y / resolution.y < 0.02)
-    finalColor = vec4(Hsv2rgb(vec3(gl_FragCoord.x/resolution.x, 1.0, 1.0)), 1);
+  /* if(false && gl_FragCoord.y / resolution.y < 0.02) */
+  /*   finalColor = vec4(Hsv2rgb(vec3(gl_FragCoord.x/resolution.x, 1.0, 1.0)), 1); */
 }

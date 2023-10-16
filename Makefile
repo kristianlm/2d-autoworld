@@ -1,3 +1,4 @@
+CC := gcc
 
 autoworld: autoworld.c autoworld.fs
 	$(CC) autoworld.c -o autoworld -lraylib
