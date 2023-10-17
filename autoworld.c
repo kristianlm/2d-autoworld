@@ -5,15 +5,8 @@
 #define BADSHADER 3 // HACK! 3 is built-in shader. how to detect shader fails?
 
 // A few good julia sets
-const float POINTS_OF_INTEREST[6][2] =
-{
-  { 0, 8.836337089539 },
-  { -0.786268, 0.169728 },
-  { -0.8, 0.156 },
-  {-0.823356747627,-0.216459855437} , // { 0.285, 0.0 },
-  { -0.835, -0.2321 },
-  { -0.70176, -0.3842 },
-  // { -0.831522226334,-0.238089501858 },
+const float POINTS_OF_INTEREST[6] = {
+  11.196718 , 0.169728 , 0.156 , -0.216459855437, -0.2321 , -0.3842 ,
 };
 
 int main(void) {
@@ -25,11 +18,11 @@ int main(void) {
   char shaderPath[] = "autoworld.fs";
   Shader shader = LoadShader(0, shaderPath);
 
-  float c[2] = { POINTS_OF_INTEREST[0][0], POINTS_OF_INTEREST[0][1] };
+  float z = POINTS_OF_INTEREST[0]; // c
 
-  float offsetStart[2] = {0,0};//{0.492528051138,0.150938585401};
+  float offsetStart[2] = {0,10000};//{0.492528051138,0.150938585401};
   float offset[2] = {offsetStart[0], offsetStart[1]};
-  float zoomStart = 1.0;
+  float zoomStart = 500.0;
   float zoom = zoomStart;
   float brightness = 1.0f;
 
@@ -59,7 +52,6 @@ int main(void) {
       }
     }
 
-    if(IsKeyPressed(KEY_ZERO)) c[0] = c[1], dirty = 1;
     if(IsKeyPressed(KEY_P)) { idle = !idle; }
     if(IsKeyPressed(KEY_SPACE)) {
       offset[0] = offsetStart[0];
@@ -69,15 +61,15 @@ int main(void) {
       dirty = 1;
     }
     if(0) ;
-    else if (IsKeyPressed(KEY_ONE))   c[0] = POINTS_OF_INTEREST[0][0], c[1] = POINTS_OF_INTEREST[0][1], dirty=1;
-    else if (IsKeyPressed(KEY_TWO))   c[0] = POINTS_OF_INTEREST[1][0], c[1] = POINTS_OF_INTEREST[1][1], dirty=1;
-    else if (IsKeyPressed(KEY_THREE)) c[0] = POINTS_OF_INTEREST[2][0], c[1] = POINTS_OF_INTEREST[2][1], dirty=1;
-    else if (IsKeyPressed(KEY_FOUR))  c[0] = POINTS_OF_INTEREST[3][0], c[1] = POINTS_OF_INTEREST[3][1], dirty=1;
-    else if (IsKeyPressed(KEY_FIVE))  c[0] = POINTS_OF_INTEREST[4][0], c[1] = POINTS_OF_INTEREST[4][1], dirty=1;
-    else if (IsKeyPressed(KEY_SIX))   c[0] = POINTS_OF_INTEREST[5][0], c[1] = POINTS_OF_INTEREST[5][1], dirty=1;
+    else if (IsKeyPressed(KEY_ONE))   z = POINTS_OF_INTEREST[0];
+    else if (IsKeyPressed(KEY_TWO))   z = POINTS_OF_INTEREST[1];
+    else if (IsKeyPressed(KEY_THREE)) z = POINTS_OF_INTEREST[2];
+    else if (IsKeyPressed(KEY_FOUR))  z = POINTS_OF_INTEREST[3];
+    else if (IsKeyPressed(KEY_FIVE))  z = POINTS_OF_INTEREST[4];
+    else if (IsKeyPressed(KEY_SIX))   z = POINTS_OF_INTEREST[5];
 
     if(GetMouseWheelMove() != 0) {
-      zoom += GetMouseWheelMove() * zoom*0.3f;
+      zoom += -GetMouseWheelMove() * zoom*0.3f;
       dirty = 1;
     }
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -86,8 +78,8 @@ int main(void) {
     if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
       Vector2 mp = GetMousePosition();
       Vector2 delta = { mp.x - mstart.x , mp.y - mstart.y };
-      offset[0] += 2.0/GetScreenWidth()  * -delta.x / zoom;
-      offset[1] += 2.0/GetScreenHeight() *  delta.y / zoom;
+      offset[0] += 2.0 * -delta.x * zoom;
+      offset[1] += 2.0 *  delta.y * zoom;
       dirty = 1;
       mstart.x = mp.x;
       mstart.y = mp.y;
@@ -97,24 +89,28 @@ int main(void) {
     if(IsKeyDown(KEY_SLASH)) brightness  = 1.0f,   dirty = 1;
     if(brightness < 0.0f) brightness = 0.0f;
 
+    /* if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP   )) amount1 =  0.1f; */
+    /* if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN )) amount1 = -0.1f; */
+    /* if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT )) amount2 =  0.1f; */
+    /* if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) amount2 = -0.1f; */
+    
     float amount1 = 0, amount2 = 0;
-    if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP   )) amount1 =  10.0f;
-    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN )) amount1 = -10.0f;
-    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT )) amount2 =  10.0f;
-    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) amount2 = -10.0f;
-    if(IsKeyDown(KEY_LEFT_CONTROL)) amount1 *=  10.0f, amount2 *=  10.0f;
-    if(IsKeyDown(KEY_LEFT_SHIFT))   amount1 *=  20.0f, amount2 *=  20.0f;
-    if(IsKeyDown(KEY_LEFT_ALT))     amount1 *=   0.1f, amount2 *=  0.1f;
+    if(IsKeyDown(KEY_W) || IsKeyDown(KEY_UP   )) amount1 =  0.1f;
+    if(IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN )) amount1 = -0.1f;
+    if(IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT )) amount2 =  0.1f;
+    if(IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) amount2 = -0.1f;
+    /**/ if(IsKeyDown(KEY_LEFT_CONTROL) && IsKeyDown(KEY_LEFT_SHIFT)) amount1 *=  100.0f, amount2 *=  100.0f;
+    else if(IsKeyDown(KEY_LEFT_CONTROL)) amount1 *=  10.0f, amount2 *=  10.0f;
+    else if(IsKeyDown(KEY_LEFT_SHIFT))   amount1 *=   0.1f, amount2 *=  0.1f;
 
     amount1 *= GetFrameTime() * 0.005f;
     amount2 *= GetFrameTime() * 0.005f;
-    c[0] += amount2;
-    c[1] += amount1;
+    z += amount2;
     if(amount1 != 0.0f || amount2 != 0.0f && shader.id != BADSHADER)
-      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "z"), &z, SHADER_UNIFORM_FLOAT);
 
     if((dirty || frame==0) && shader.id != BADSHADER) {
-      SetShaderValue(shader, GetShaderLocation(shader, "c"), c, SHADER_UNIFORM_VEC2);
+      SetShaderValue(shader, GetShaderLocation(shader, "z"), &z, SHADER_UNIFORM_FLOAT);
       SetShaderValue(shader, GetShaderLocation(shader, "zoom"), &zoom, SHADER_UNIFORM_FLOAT);
       SetShaderValue(shader, GetShaderLocation(shader, "offset"), offset, SHADER_UNIFORM_VEC2);
       // glUniform3dv(shader.id, GetShaderLocation(shader, "offset"), &offset);
@@ -134,19 +130,19 @@ int main(void) {
     /**/EndShaderMode();
 
     }
-    /**/Color color_text = MAGENTA; int size=20; int ty = 10;
-    /**/DrawText(TextFormat("fps %d @ %.1f", GetFPS(), time), 10, ty, size, color_text); ty+=size;
+    /**/Color color_text = BLUE; int size=20; int ty = 10;
+    /**/DrawText(TextFormat("fps %d %s @ %.1f", GetFPS(), idle ? "[idle]" : "", time), 10, ty, size, color_text); ty+=size;
     /**/DrawText(TextFormat("offset [%.4f,%.4f]",
                             offset[0], offset[1]), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(TextFormat("zoom %.3f (%.0f²)", zoom, 2.0/(zoom)), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(TextFormat("c [%.6f,%.6f]", c[0], c[1]), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(TextFormat("zoom %.3f", zoom), 10, ty, size, color_text); ty+=size;
+    /**/DrawText(TextFormat("z %.6f", z), 10, ty, size, color_text); ty+=size;
     ///**/DrawText(TextFormat("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
     EndDrawing();
 
     frame++;
   }
 
-  printf("c {%.12f,%.12f}\n", c[0], c[1]);
+  printf("z = %.12f\n", z);
   printf("o {%.12f,%.12f}\n", offset[0], offset[1]);
   UnloadShader(shader);
   CloseWindow();
