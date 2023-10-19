@@ -1,7 +1,8 @@
 # 2d autoworld
 
-This is a small experiment of mine. I wanted to do a
-procedurally-generated-terrain using a Julia Set.
+This is a small experiment of mine. This program will let you
+experiment with various functions for generating simple 2d box
+terrain.
 
 Build with `make`. I'm using the raylib gaming library for everything
 graphics-related. The terrain is "generated" (calculated, rather) in
