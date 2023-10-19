@@ -121,11 +121,21 @@ double height0(dvec2 start, double z, int octave) {
 }
 
 double height(dvec2 start, double z) {
-  double j = 0;
-  for(int octave = -16 ; octave < 0; octave++) {
-    j += height0(start, z, octave);
+  const float persistence = 0.71;
+  const float lacunarity = 2.3;
+  int octave_start = -20;
+  int octave_end = 0;
+  double sum = 0;
+  double amplitude  = pow(persistence, octave_start);
+  double wavelength = pow(lacunarity,  octave_start);
+  double amplitude_max = 0;
+  for(int octave = octave_start ; octave < octave_end; octave++) {
+    sum += amplitude * snoise(vec3(start * wavelength, z + octave/*or another hash*/));
+    amplitude_max += amplitude;
+    wavelength *= lacunarity;
+    amplitude *= persistence;
   }
-  return j;
+  return sum / amplitude_max;
 }
 
 bool box(double h) {
@@ -140,7 +150,8 @@ void main() {
   const vec3 frozen = vec3(0.2);
   const vec3 free   = vec3(0.3);
   vec3 color = box(h) ? free : ground;
-
+  //double b = box(height(p - mod(p, 1), z)) ? .3 : 0.0;
+  //vec3 color = vec3((-h), (h), b);
   /**/ if(box(h)
           && box(height(p + vec2( 1, 0), z))
           && box(height(p + vec2( 0, 1), z))
@@ -158,8 +169,8 @@ void main() {
           && box(height(p + vec2( 0, 1), z))
           && box(height(p + vec2(-1, 1), z))) color = frozen;
   
-  if(zoom < 0.12 && floor(screen2world(gl_FragCoord.xy + 1))
-     /**/        != floor(screen2world(gl_FragCoord.xy - 0)))
-    color *= 0.85;
+  if(zoom < 0.2 && floor(screen2world(gl_FragCoord.xy + 0.5))
+     /**/        != floor(screen2world(gl_FragCoord.xy - 0.5)))
+    color *= 0.6;
   finalColor = vec4(color, 1);
 }

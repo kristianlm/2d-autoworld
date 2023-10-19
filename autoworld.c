@@ -6,7 +6,7 @@
 
 // A few good julia sets
 const float POINTS_OF_INTEREST[6] = {
-  11.196718 , 0.169728 , 0.156 , -0.216459855437, -0.2321 , -0.3842 ,
+  11.4318 , 0.169728 , 0.156 , -0.216459855437, -0.2321 , -0.3842 ,
 };
 
 int main(void) {
@@ -18,11 +18,11 @@ int main(void) {
   char shaderPath[] = "autoworld.fs";
   Shader shader = LoadShader(0, shaderPath);
 
-  float z = POINTS_OF_INTEREST[0]; // c
+  float z = POINTS_OF_INTEREST[0];
 
-  float offsetStart[2] = {0,10000};//{0.492528051138,0.150938585401};
+  float offsetStart[2] = {794, -1962};
   float offset[2] = {offsetStart[0], offsetStart[1]};
-  float zoomStart = 500.0;
+  float zoomStart = 0.125;
   float zoom = zoomStart;
   float brightness = 1.0f;
 
@@ -130,13 +130,12 @@ int main(void) {
     /**/EndShaderMode();
 
     }
-    /**/Color color_text = BLUE; int size=20; int ty = 10;
-    /**/DrawText(TextFormat("fps %d %s @ %.1f", GetFPS(), idle ? "[idle]" : "", time), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(TextFormat("offset [%.4f,%.4f]",
+    Color color_text = (Color){0,125,255,100}; int size=20; int ty = 10;
+    DrawText(TextFormat("fps %d %s %.0f", GetFPS(), idle ? "[idle]" : "", time), 10, ty, size, color_text); ty+=size;
+    DrawText(TextFormat("offset [%.4f,%.4f]",
                             offset[0], offset[1]), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(TextFormat("zoom %.3f", zoom), 10, ty, size, color_text); ty+=size;
-    /**/DrawText(TextFormat("z %.6f", z), 10, ty, size, color_text); ty+=size;
-    ///**/DrawText(TextFormat("brightness %.3f", brightness), 10, ty, size, color_text); ty+=size;
+    //DrawText(TextFormat("z %.6f", z), 10, ty, size, color_text); ty+=size;
+    DrawText(TextFormat("z %.4f zoom %.6f %.0fx%.0f", z, zoom, zoom*GetScreenWidth(), zoom*GetScreenHeight()), 10, ty, size, color_text); ty+=size;
     EndDrawing();
 
     frame++;
